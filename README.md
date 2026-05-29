@@ -1,7 +1,7 @@
 # spacex-landing-pinn-uq
 Physics‑constrained ML for Falcon 9 landing success. Energy/TWR penalties, deep ensemble, cost‑optimal threshold. AUC‑PR 0.95, zero‑shot generalisation, SHAP explainable.
 
-# Project 3: Physics‑Constrained Falcon 9 Landing Prediction
+ Project Topics: Physics‑Constrained Falcon 9 Landing Prediction
 
 
 
@@ -178,10 +178,3 @@ Two major challenges remain: (1) reducing the physics violation rate to 0% by mo
 
 ---
 
-## How to Reproduce
-
-1. Clone the repository and install dependencies:
-   ```bash
-   git clone https://github.com/your-username/spacex-landing-pinn-uq.git
-   cd spacex-landing-pinn-uq
-   pip install -r requirements.txt
