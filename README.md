@@ -107,7 +107,8 @@ To build a calibrated, cost‑sensitive, and physically interpretable model for 
 ### Key Insights
 
 - **Ranking vs Calibration:** The model discriminates very well (AUC‑PR 0.95) but its probability estimates are severely miscalibrated – predicted probabilities cannot be directly interpreted as true likelihoods. Temperature scaling actually increased ECE, indicating non‑uniform miscalibration.
-- **Cost‑optimal threshold collapsed to \(\tau^*=0\)** (always predict success) because FP cost is negligible compared to FN cost and the test set has 96.7% successes. This minimises expected cost at $2 M per launch, a $14 M per launch saving over a naive 0.5 threshold.
+- **Cost‑optimal threshold collapsed to <img width="1028" height="83" alt="image" src="https://github.com/user-attachments/assets/22222e48-b15c-489c-9144-d4e674bd4652" />
+** (always predict success) because FP cost is negligible compared to FN cost and the test set has 96.7% successes. This minimises expected cost at $2 M per launch, a $14 M per launch saving over a naive 0.5 threshold.
 - **Physics violation rate of 2%:** the sample‑weighted constraint reduced violations but did not eliminate them. The baseline model (no physics weighting) had an even lower PVR (0.003), suggesting the constraint implementation needs refinement.
 - **SHAP analysis** shows `Legs` and `GridFins` as the most influential features – physically plausible. `KE_reentry` negatively impacts predictions when high, matching energy‑based failure modes.
 
