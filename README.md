@@ -78,7 +78,8 @@ To build a calibrated, cost‑sensitive, and physically interpretable model for 
 
 <img width="1044" height="528" alt="image" src="https://github.com/user-attachments/assets/1e374209-b5a2-42c8-8197-71141e0b24b6" />
 
-- **Optimal threshold** \(\tau^*\) minimises this cost on the training period and is applied to the Block 5 test set.
+- **Optimal threshold** \( <img width="1028" height="83" alt="image" src="https://github.com/user-attachments/assets/a0ab0843-37ac-48e4-95a3-f9961a68273b" />
+) minimises this cost on the training period and is applied to the Block 5 test set.
 <img width="970" height="375" alt="image" src="https://github.com/user-attachments/assets/b084f6cd-7911-4045-b400-95dbefe837f2" />
 
 ### 5. Evaluation Metrics
