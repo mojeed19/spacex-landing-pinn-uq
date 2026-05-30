@@ -55,56 +55,34 @@ To build a calibrated, cost‑sensitive, and physically interpretable model for 
 
 ### 1. Physics Feature Engineering
 
-- **Stage mass:** \( m = m_{\text{dry}} + m_{\text{payload}} \) with \( m_{\text{dry}} = 22,200\,\text{kg} \).  
-- **Thrust‑to‑Weight Ratio:**  
-  \[
-  \text{TWR} = \frac{T_{\text{vac}}}{m \cdot g},\quad T_{\text{vac}} = 7607\,\text{kN},\; g = 9.81\,\text{m/s}^2.
-  \]
-- **Reentry velocity:** mapped from orbit (e.g., GTO → 2300 m/s, LEO → 1800 m/s).  
-- **Reentry kinetic energy:**  
-  \[
-  KE = \frac{1}{2} m v_{\text{entry}}^2.
-  \]
+<img width="1020" height="663" alt="image" src="https://github.com/user-attachments/assets/c1a4a01d-dfda-4b86-ad04-53a45b86930f" />
+<img width="1088" height="397" alt="image" src="https://github.com/user-attachments/assets/5d453be3-9204-4071-b60c-9451028eb4a9" />
+
 - **Safe KE threshold:** 95% of the maximum kinetic energy observed in successful Block 3/4 landings.  
 - **Downrange distance:** lookup table based on launch site and orbit.
 
 ### 2. Physics‑Constrained Loss (Penalty Method)
 
-The total loss is the sum of binary cross‑entropy and two penalty terms:
+<img width="1022" height="648" alt="image" src="https://github.com/user-attachments/assets/a75105ea-7cee-4e02-bf30-b5b30b3c203a" />
 
-\[
-\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{BCE}} + \lambda_{\text{KE}} \cdot \mathbf{1}_{(KE > KE_{\text{safe}})} \cdot \mathbf{1}_{(\hat{y}=0)} \cdot w + \lambda_{\text{TWR}} \cdot \mathbf{1}_{(\text{TWR} < 1.1)} \cdot \mathbf{1}_{(\hat{y}=0)} \cdot w,
-\]
-
-where \( w \) is the model’s predicted probability (more confident wrong predictions are penalised harder). Penalties are active only when the model predicts failure (\(\hat{y}=0\)) and the physical constraint is violated. At inference time, the penalty terms are removed – no extra computational cost.
+<img width="1022" height="358" alt="image" src="https://github.com/user-attachments/assets/addac800-56ec-44de-a7db-7dbab01241b0" />
 
 ### 3. Uncertainty Quantification & Calibration
 
-- **Deep ensemble:** average predictions of 5 XGBoost models (different seeds) + Bayesian logistic regression.  
-- **Posterior mean and standard deviation** computed from the ensemble.  
-- **Platt scaling:** a temperature parameter \(T\) learned on validation data to minimise the Expected Calibration Error (ECE):  
-  \[
-  \text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{n} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|,
-  \]
-  where \(B_m\) are probability bins. Target ECE ≤ 0.05 so that a 90% confidence interval contains the true outcome 90% of the time.
+<img width="1031" height="516" alt="image" src="https://github.com/user-attachments/assets/7312d755-c8c2-4eb6-a4fa-82736c40c9da" />
+<img width="1045" height="538" alt="image" src="https://github.com/user-attachments/assets/df36bb4f-e137-4a4a-9cd5-f931ce4d5c70" />
+
+ Target ECE ≤ 0.05 so that a 90% confidence interval contains the true outcome 90% of the time.
 
 ### 4. Cost‑Optimal Decision Threshold
 
-- **Cost matrix:**  
-  \[
-  C = \begin{pmatrix}
-  0 & C_{FP} \\
-  C_{FN} & 0
-  \end{pmatrix},
-  \quad C_{FN} = \$62\,\text{M},\; C_{FP} = \$0.2\,\text{M}.
-  \]
-- **Expected cost for a threshold \(\tau\):**  
-  \[
-  \mathbb{E}[\text{cost}(\tau)] = \text{FN}(\tau) \times 62\,\text{M} + \text{FP}(\tau) \times 0.2\,\text{M}.
-  \]
+<img width="1044" height="528" alt="image" src="https://github.com/user-attachments/assets/1e374209-b5a2-42c8-8197-71141e0b24b6" />
+
 - **Optimal threshold** \(\tau^*\) minimises this cost on the training period and is applied to the Block 5 test set.
+<img width="970" height="375" alt="image" src="https://github.com/user-attachments/assets/b084f6cd-7911-4045-b400-95dbefe837f2" />
 
 ### 5. Evaluation Metrics
+<img width="1100" height="539" alt="image" src="https://github.com/user-attachments/assets/25073795-bf32-4555-a6ab-52c9583905e8" />
 
 | Metric | Target | Description |
 |--------|--------|-------------|
@@ -160,3 +138,16 @@ The reliability diagram shows systematic over‑confidence for low‑probability
 This project successfully demonstrates that physics‑constrained machine learning can improve the economic decision‑making for SpaceX landing recovery. Our model achieves state‑of‑the‑art AUC‑PR (0.9494) and reduces expected mission cost from $14 M to $2 M per launch by optimising the decision threshold with a realistic cost matrix. The zero‑shot generalisation from Block 3/4 to Block 5 proves that the engineered physics features (TWR, reentry kinetic energy, downrange) capture fundamental rocketry principles, not overfitted patterns.
 
 Two major challenges remain: (1) reducing the physics violation rate to 0% by moving to a differentiable penalty loss inside the model, and (2) improving probability calibration so that the model’s confidence intervals are trustworthy for launch commit audits. Nevertheless, this work sets a new benchmark for scientific machine learning in aerospace, merging PDE‑inspired constraints, Bayesian uncertainty, and cost‑sensitive learning into a single, deployable pipeline.
+
+## References
+
+1. SpaceX (2020). *Falcon 9 User Guide*. SpaceX Proprietary Information.  
+2. NASA Technical Memorandum 2010‑216345, *Reentry Dynamics and Thermal Protection Systems*.  
+3. Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning* (2nd ed.). Springer.  
+4. Nocedal, J., & Wright, S. J. (2006). *Numerical Optimization* (2nd ed.). Springer.  
+5. Bertsekas, D. P. (1999). *Nonlinear Programming* (2nd ed.). Athena Scientific.  
+6. Lakshminarayanan, B., Pritzel, A., & Blundell, C. (2017). Simple and scalable predictive uncertainty estimation using deep ensembles. *Advances in Neural Information Processing Systems (NIPS)*, 30.  
+7. Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. *Proceedings of the 34th International Conference on Machine Learning (ICML)*, 70, 1321–1330.  
+8. Naeini, M. P., Cooper, G. F., & Hauskrecht, M. (2015). Obtaining well calibrated probabilities using Bayesian binning. *Proceedings of the 29th AAAI Conference on Artificial Intelligence*, 2901–2907.  
+9. Elkan, C. (2001). The foundations of cost‑sensitive learning. *Proceedings of the 17th International Joint Conference on Artificial Intelligence (IJCAI)*, 973–978.  
+10. Ben‑David, S., Blitzer, J., Crammer, K., Kulesza, A., Pereira, F., & Vaughan, J. W. (2010). A theory of learning from different domains. *Machine Learning*, 79(1–2), 151–175.
